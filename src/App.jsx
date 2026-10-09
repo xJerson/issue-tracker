@@ -107,6 +107,20 @@ export default function App() {
     );
   }
 
+  function addComment(issueId, comment) {
+    // Keep comments in the same chronological activity stream as workflow changes.
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) =>
+        issue.id === issueId
+          ? {
+              ...issue,
+              activity: [...(issue.activity ?? []), createActivity(`Commented: ${comment}`)],
+            }
+          : issue,
+      ),
+    );
+  }
+
   function createIssue(draft) {
     setIssues((currentIssues) => {
       // Derive the next readable identifier from existing ticket identifiers.
@@ -361,6 +375,7 @@ export default function App() {
       <IssueDetailDrawer
         issue={selectedIssue}
         onAdvance={advanceIssue}
+        onAddComment={addComment}
         onClose={() => setSelectedIssueId(null)}
         onUpdate={updateIssue}
       />

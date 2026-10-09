@@ -25,7 +25,7 @@ import TicketActivity from "./TicketActivity";
 import { getNextStatus, statusLabels } from "./workflow";
 
 // The drawer focuses one ticket so operators can make a deliberate workflow decision.
-export default function IssueDetailDrawer({ issue, onAdvance, onClose, onUpdate }) {
+export default function IssueDetailDrawer({ issue, onAddComment, onAdvance, onClose, onUpdate }) {
   const nextStatus = issue ? getNextStatus(issue.status) : null;
 
   return (
@@ -194,7 +194,10 @@ export default function IssueDetailDrawer({ issue, onAdvance, onClose, onUpdate 
                 Activity
               </Typography>
               <Box sx={{ mt: 1.5 }}>
-                <TicketActivity activity={issue.activity ?? []} />
+                <TicketActivity
+                  activity={issue.activity ?? []}
+                  onAddComment={(comment) => onAddComment(issue.id, comment)}
+                />
               </Box>
             </Box>
 
