@@ -8,6 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import { teamMembers } from "./data/teamMembers";
 
 const initialForm = {
   title: "",
@@ -100,10 +101,11 @@ export default function CreateIssueDialog({ open, onClose, onCreate }) {
               select
               value={form.assignee}
             >
-              <MenuItem value="Jerson">Jerson</MenuItem>
-              <MenuItem value="Ana">Ana</MenuItem>
-              <MenuItem value="Mateo">Mateo</MenuItem>
-              <MenuItem value="Sofia">Sofia</MenuItem>
+              {teamMembers.map((member) => (
+                <MenuItem key={member} value={member}>
+                  {member}
+                </MenuItem>
+              ))}
             </TextField>
           </Stack>
         </DialogContent>

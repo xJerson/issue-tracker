@@ -76,6 +76,13 @@ export default function App() {
     );
   }
 
+  function updateIssue(issueId, updates) {
+    // Triage changes update only the selected ticket and remain persisted by useIssues.
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) => (issue.id === issueId ? { ...issue, ...updates } : issue)),
+    );
+  }
+
   function createIssue(draft) {
     setIssues((currentIssues) => {
       // Derive the next readable identifier from existing ticket identifiers.
@@ -330,6 +337,7 @@ export default function App() {
         issue={selectedIssue}
         onAdvance={advanceIssue}
         onClose={() => setSelectedIssueId(null)}
+        onUpdate={updateIssue}
       />
       <CreateIssueDialog
         onClose={() => setIsCreateDialogOpen(false)}

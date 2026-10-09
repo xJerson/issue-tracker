@@ -10,7 +10,11 @@ export function loadIssues(fallbackIssues) {
     }
 
     const parsedIssues = JSON.parse(savedIssues);
-    return Array.isArray(parsedIssues) ? parsedIssues : fallbackIssues;
+
+    // Add fields introduced by newer versions without discarding existing local tickets.
+    return Array.isArray(parsedIssues)
+      ? parsedIssues.map((issue) => ({ blockReason: "", ...issue }))
+      : fallbackIssues;
   } catch {
     // Fall back to seed data if storage is unavailable or contains invalid JSON.
     return fallbackIssues;
