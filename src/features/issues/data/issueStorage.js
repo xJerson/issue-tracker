@@ -2,6 +2,14 @@ const storageKey = "andes-pay-issues";
 
 function normalizeIssue(issue) {
   return {
+    activity: [
+      {
+        author: issue.reporter,
+        createdAt: issue.reportedAt,
+        id: `${issue.id}-reported`,
+        message: "Reported this ticket.",
+      },
+    ],
     blockReason: "",
     category: "infrastructure",
     severity: issue.priority === "high" ? "p1" : "p3",

@@ -17,7 +17,7 @@ import IssueDetailDrawer from "./features/issues/IssueDetailDrawer";
 import IssueFilters from "./features/issues/IssueFilters";
 import IssueList from "./features/issues/IssueList";
 import useIssues from "./features/issues/useIssues";
-import { getNextStatus } from "./features/issues/workflow";
+import { getNextStatus, statusLabels } from "./features/issues/workflow";
 import WorkflowMenu from "./features/issues/WorkflowMenu";
 
 // Keep a single resettable shape for every filter used by the ticket queue.
@@ -27,6 +27,17 @@ const initialFilters = {
   priority: "all",
   query: "",
 };
+
+const currentOperator = "Jerson";
+
+function createActivity(message) {
+  return {
+    author: currentOperator,
+    createdAt: new Date().toLocaleString("en-US"),
+    id: `${Date.now()}-${Math.random()}`,
+    message,
+  };
+}
 
 // App composes the first Issue Tracker screen from feature-level components.
 export default function App() {
@@ -70,8 +81,21 @@ export default function App() {
           return issue;
         }
 
+        const nextStatus = getNextStatus(issue.status);
+
+        if (!nextStatus) {
+          return issue;
+        }
+
         // Move only one step forward, never directly to an arbitrary phase.
-        return { ...issue, status: getNextStatus(issue.status) ?? issue.status };
+        return {
+          ...issue,
+          activity: [
+            ...(issue.activity ?? []),
+            createActivity(`Moved the ticket from ${statusLabels[issue.status]} to ${statusLabels[nextStatus]}.`),
+          ],
+          status: nextStatus,
+        };
       }),
     );
   }
@@ -96,6 +120,7 @@ export default function App() {
           ...draft,
           id: `INC-${highestIssueNumber + 1}`,
           isBlocked: false,
+          activity: [createActivity(`Reported a new ${draft.type} ticket.`)],
           reportedAt: new Date().toISOString().slice(0, 10),
           status: "reported",
         },

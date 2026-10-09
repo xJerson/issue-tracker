@@ -21,6 +21,7 @@ import {
   severityLevels,
 } from "./data/issueCatalog";
 import { teamMembers } from "./data/teamMembers";
+import TicketActivity from "./TicketActivity";
 import { getNextStatus, statusLabels } from "./workflow";
 
 // The drawer focuses one ticket so operators can make a deliberate workflow decision.
@@ -184,6 +185,17 @@ export default function IssueDetailDrawer({ issue, onAdvance, onClose, onUpdate 
                 Reported at
               </Typography>
               <Typography>{issue.reportedAt}</Typography>
+            </Box>
+
+            <Divider />
+
+            <Box>
+              <Typography fontWeight={700} variant="subtitle1">
+                Activity
+              </Typography>
+              <Box sx={{ mt: 1.5 }}>
+                <TicketActivity activity={issue.activity ?? []} />
+              </Box>
             </Box>
 
             {nextStatus ? (
