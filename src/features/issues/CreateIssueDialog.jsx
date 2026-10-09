@@ -8,6 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import { issueCategories, issueTypes, severityLevels } from "./data/issueCatalog";
 import { teamMembers } from "./data/teamMembers";
 
 const initialForm = {
@@ -16,6 +17,9 @@ const initialForm = {
   priority: "medium",
   reporter: "Customer Support",
   assignee: "Jerson",
+  type: "bug",
+  category: "authentication",
+  severity: "p3",
 };
 
 // This dialog collects the information required to report a new ticket.
@@ -82,6 +86,39 @@ export default function CreateIssueDialog({ open, onClose, onCreate }) {
               <MenuItem value="Customer Support">Customer Support</MenuItem>
               <MenuItem value="Monitoring">Monitoring</MenuItem>
               <MenuItem value="Product Team">Product Team</MenuItem>
+            </TextField>
+            <TextField label="Type" name="type" onChange={updateField} select value={form.type}>
+              {issueTypes.map((type) => (
+                <MenuItem key={type.value} value={type.value}>
+                  {type.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              label="Category"
+              name="category"
+              onChange={updateField}
+              select
+              value={form.category}
+            >
+              {issueCategories.map((category) => (
+                <MenuItem key={category.value} value={category.value}>
+                  {category.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              label="Severity"
+              name="severity"
+              onChange={updateField}
+              select
+              value={form.severity}
+            >
+              {severityLevels.map((severity) => (
+                <MenuItem key={severity.value} value={severity.value}>
+                  {severity.label}
+                </MenuItem>
+              ))}
             </TextField>
             <TextField
               label="Priority"
