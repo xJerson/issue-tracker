@@ -11,7 +11,7 @@ export default function TicketQueue({ assignees, filters, issues, onClearFilters
   return (
     <Container disableGutters maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 5, lg: 8 }, py: { xs: 4, md: 6 } }}>
       <Box sx={{ alignItems: "start", display: "grid", gap: 3, gridTemplateColumns: { xs: "1fr", md: "260px minmax(0, 1fr)" } }}>
-        <Paper component="aside" elevation={0} sx={{ border: 1, borderColor: "rgba(148, 163, 184, 0.24)", boxShadow: "0 12px 32px rgba(15, 23, 42, 0.05)", p: 2.5, position: { md: "sticky" }, top: { md: 24 } }}>
+        <Paper component="aside" elevation={0} sx={{ border: "1px solid #C9D8E0", borderTop: "4px solid #007C78", boxShadow: "0 12px 32px rgba(23, 53, 74, 0.06)", p: 2.5, position: { md: "sticky" }, top: { md: 24 } }}>
           <WorkflowMenu issues={issues} onSelectPhase={onSelectPhase} selectedPhase={selectedPhase} />
         </Paper>
         <Box>

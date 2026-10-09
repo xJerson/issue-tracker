@@ -3,29 +3,32 @@ import { createTheme } from "@mui/material/styles";
 // Centralize visual decisions so every future screen uses the same design system.
 const theme = createTheme({
   palette: {
-    primary: { main: "#4F46E5", dark: "#3730A3" },
-    secondary: { main: "#7C3AED" },
-    background: { default: "#F4F6FB", paper: "#FFFFFF" },
+    primary: { main: "#007C78", dark: "#005B58", light: "#D8F0EE" },
+    secondary: { main: "#2B5D8A" },
+    background: { default: "#EAF0F4", paper: "#FFFFFF" },
+    text: { primary: "#172B3A", secondary: "#587080" },
   },
-  shape: { borderRadius: 16 },
+  shape: { borderRadius: 8 },
   typography: {
-    fontFamily: "Inter, system-ui, sans-serif",
-    h3: { fontWeight: 700, letterSpacing: "-0.03em" },
+    fontFamily: "Segoe UI Variable, Segoe UI, system-ui, sans-serif",
+    h3: { fontWeight: 750, letterSpacing: "-0.035em", lineHeight: 1.05 },
+    h4: { fontWeight: 750, letterSpacing: "-0.025em" },
+    h5: { fontWeight: 700, letterSpacing: "-0.02em" },
   },
   components: {
     MuiButton: {
       styleOverrides: {
-        root: { borderRadius: 10, fontWeight: 700, textTransform: "none" },
+        root: { borderRadius: 6, fontWeight: 700, textTransform: "none" },
       },
     },
     MuiCard: {
       styleOverrides: {
-        root: { backgroundImage: "none", borderRadius: 18 },
+        root: { backgroundImage: "none", borderRadius: 10 },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: { backgroundImage: "none" },
+        root: { backgroundImage: "none", borderRadius: 10 },
       },
     },
   },

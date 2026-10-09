@@ -10,27 +10,27 @@ export default function DashboardOverview({ issueSummary, issues, today }) {
   return (
     <Container disableGutters maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 5, lg: 8 }, py: { xs: 4, md: 6 } }}>
       <Stack spacing={4}>
-        <Box>
-          <Typography color="primary" fontWeight={700} variant="overline">
-            Product workspace
-          </Typography>
-          <Typography component="h1" sx={{ mt: 1 }} variant="h3">
-            Keep product issues visible and actionable.
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 1 }}>
-            {today}
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 2 }}>
-            Review the current work, identify blockers, and keep the team aligned.
-          </Typography>
-        </Box>
+        <Paper elevation={0} sx={{ backgroundColor: "#17354A", color: "common.white", overflow: "hidden", p: { xs: 3, md: 4 }, position: "relative" }}>
+          <Box sx={{ borderLeft: "4px solid #75D8D2", maxWidth: 700, pl: 2.5, position: "relative" }}>
+            <Typography color="rgba(232, 245, 247, 0.76)" variant="body2">
+              {today}
+            </Typography>
+            <Typography component="h1" sx={{ mt: 1 }} variant="h3">
+              Today in operations
+            </Typography>
+            <Typography color="rgba(232, 245, 247, 0.82)" sx={{ mt: 1.5 }}>
+              See where incidents need attention before they affect customers.
+            </Typography>
+          </Box>
+          <Box sx={{ backgroundColor: "rgba(117, 216, 210, 0.22)", borderRadius: "50%", height: 220, position: "absolute", right: -80, top: -120, width: 220 }} />
+        </Paper>
 
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" } }}>
           {issueSummary.map((item) => (
             <Paper
               elevation={0}
               key={item.label}
-              sx={{ border: 1, borderColor: "rgba(148, 163, 184, 0.24)", overflow: "hidden", p: 2.5, position: "relative" }}
+              sx={{ border: "1px solid #C9D8E0", overflow: "hidden", p: 2.5, position: "relative" }}
             >
               <Box sx={{ alignItems: "start", display: "flex", justifyContent: "space-between" }}>
                 <Box>

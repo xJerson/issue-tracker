@@ -19,7 +19,7 @@ export default function DashboardMetrics({ issues }) {
 
   return (
     <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.6fr) minmax(280px, 1fr)" } }}>
-      <Paper elevation={0} sx={{ border: 1, borderColor: "rgba(148, 163, 184, 0.24)", p: 2.5 }}>
+      <Paper elevation={0} sx={{ border: "1px solid #C9D8E0", p: 2.5 }}>
         <Typography fontWeight={700} variant="subtitle1">
           Workflow distribution
         </Typography>
@@ -46,7 +46,7 @@ export default function DashboardMetrics({ issues }) {
 
       <Stack spacing={2}>
         {metrics.map((metric) => (
-          <Paper elevation={0} key={metric.label} sx={{ border: 1, borderColor: "rgba(148, 163, 184, 0.24)", p: 2 }}>
+          <Paper elevation={0} key={metric.label} sx={{ border: "1px solid #C9D8E0", p: 2 }}>
             <Typography color="text.secondary" fontWeight={600} variant="body2">
               {metric.label}
             </Typography>

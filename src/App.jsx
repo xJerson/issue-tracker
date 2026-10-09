@@ -274,37 +274,37 @@ export default function App() {
     <Box
       component="main"
       sx={{
-        background: "linear-gradient(180deg, #EEF2FF 0, #F4F6FB 360px)",
+        background: "linear-gradient(180deg, #DCE8EF 0, #EAF0F4 430px)",
         minHeight: "100vh",
       }}
     >
       <AppBar
-        color="inherit"
+        color="transparent"
         elevation={0}
         position="static"
-        sx={{ backgroundColor: "rgba(255, 255, 255, 0.82)" }}
+        sx={{ backgroundColor: "#17354A" }}
       >
         <Toolbar
           sx={{
-            borderBottom: 1,
-            borderColor: "divider",
+            borderBottom: "1px solid rgba(216, 240, 238, 0.22)",
             px: { xs: 2, md: 5, lg: 8 },
           }}
         >
-          <BugReportRoundedIcon color="primary" sx={{ mr: 1 }} />
-          <Typography color="text.primary" fontWeight={700} variant="h6">
+          <BugReportRoundedIcon sx={{ color: "#75D8D2", mr: 1 }} />
+          <Typography color="common.white" fontWeight={700} variant="h6">
             Issue Tracker
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Button component={RouterLink} to="/" color="inherit">
+          <Button component={RouterLink} to="/" sx={{ color: "#D8E7ED" }}>
             Overview
           </Button>
-          <Button component={RouterLink} to="/tickets" color="inherit" sx={{ mr: 1 }}>
+          <Button component={RouterLink} to="/tickets" sx={{ color: "#D8E7ED", mr: 1 }}>
             Tickets
           </Button>
           <Button
             onClick={() => setIsCreateDialogOpen(true)}
             startIcon={<AddRoundedIcon />}
+            sx={{ backgroundColor: "#75D8D2", color: "#123044", "&:hover": { backgroundColor: "#A3E7E2" } }}
             variant="contained"
           >
             New issue
