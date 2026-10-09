@@ -1,6 +1,9 @@
 import { useState } from "react";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
+import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import BugReportRoundedIcon from "@mui/icons-material/BugReportRounded";
+import FiberNewRoundedIcon from "@mui/icons-material/FiberNewRounded";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -12,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import CreateIssueDialog from "./features/issues/CreateIssueDialog";
 import IssueDetailDrawer from "./features/issues/IssueDetailDrawer";
 import IssueList from "./features/issues/IssueList";
-import { issues as initialIssues } from "./features/issues/data/issues";
+import useIssues from "./features/issues/useIssues";
 import { getNextStatus } from "./features/issues/workflow";
 import WorkflowMenu from "./features/issues/WorkflowMenu";
 
@@ -20,8 +23,8 @@ import WorkflowMenu from "./features/issues/WorkflowMenu";
 export default function App() {
   // Keep the date stable for this page visit instead of recreating it on every render.
   const [currentDate] = useState(() => new Date());
-  // Ticket data becomes state because operators can now update its workflow phase.
-  const [issues, setIssues] = useState(initialIssues);
+  // This custom Hook loads saved tickets and keeps later changes persisted.
+  const [issues, setIssues] = useIssues();
   // This phase is shared by the workflow menu and the ticket list.
   const [selectedPhase, setSelectedPhase] = useState("all");
   // The selected ticket controls whether the detail drawer is open.
@@ -77,12 +80,37 @@ export default function App() {
 
   // Derive summary values from the source data instead of duplicating state.
   const issueSummary = [
-    { label: "Total issues", value: issues.length },
-    { label: "Reported", value: issues.filter((issue) => issue.status === "reported").length },
-    { label: "Blocked", value: issues.filter((issue) => issue.isBlocked).length },
+    {
+      label: "Total tickets",
+      value: issues.length,
+      helper: "Across all workflow phases",
+      icon: ArticleRoundedIcon,
+      color: "#4F46E5",
+      tint: "rgba(79, 70, 229, 0.12)",
+    },
+    {
+      label: "New reports",
+      value: issues.filter((issue) => issue.status === "reported").length,
+      helper: "Awaiting triage",
+      icon: FiberNewRoundedIcon,
+      color: "#0284C7",
+      tint: "rgba(2, 132, 199, 0.12)",
+    },
+    {
+      label: "Blocked",
+      value: issues.filter((issue) => issue.isBlocked).length,
+      helper: "Need an external action",
+      icon: BlockRoundedIcon,
+      color: "#DC2626",
+      tint: "rgba(220, 38, 38, 0.12)",
+    },
     {
       label: "High priority",
       value: issues.filter((issue) => issue.priority === "high").length,
+      helper: "Require rapid attention",
+      icon: BugReportRoundedIcon,
+      color: "#D97706",
+      tint: "rgba(217, 119, 6, 0.12)",
     },
   ];
 
@@ -96,8 +124,19 @@ export default function App() {
 
   // Pass data down as a prop. The list should not know where the data comes from.
   return (
-    <Box component="main" sx={{ minHeight: "100vh" }}>
-      <AppBar color="inherit" elevation={0} position="static">
+    <Box
+      component="main"
+      sx={{
+        background: "linear-gradient(180deg, #EEF2FF 0, #F4F6FB 360px)",
+        minHeight: "100vh",
+      }}
+    >
+      <AppBar
+        color="inherit"
+        elevation={0}
+        position="static"
+        sx={{ backgroundColor: "rgba(255, 255, 255, 0.82)" }}
+      >
         <Toolbar
           sx={{
             borderBottom: 1,
@@ -140,25 +179,71 @@ export default function App() {
             <Typography color="text.secondary" sx={{ mt: 2 }}>
               Review the current work, identify blockers, and keep the team aligned.
             </Typography>
+            <Typography color="text.secondary" sx={{ mt: 1 }} variant="body2">
+              Changes are saved automatically in this browser.
+            </Typography>
           </Box>
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          <Box
+            sx={{
+              display: "grid",
+              gap: 2,
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" },
+            }}
+          >
             {issueSummary.map((item) => (
-              // A stable label identifies each summary card.
+              // Each item supplies its own color and icon, keeping the indicator reusable.
               <Paper
                 elevation={0}
                 key={item.label}
-                sx={{ border: 1, borderColor: "divider", flex: 1, p: 2.5 }}
+                sx={{
+                  border: 1,
+                  borderColor: "rgba(148, 163, 184, 0.24)",
+                  overflow: "hidden",
+                  p: 2.5,
+                  position: "relative",
+                }}
               >
-                <Typography color="text.secondary" variant="body2">
-                  {item.label}
+                <Box sx={{ alignItems: "start", display: "flex", justifyContent: "space-between" }}>
+                  <Box>
+                    <Typography color="text.secondary" fontWeight={600} variant="body2">
+                      {item.label}
+                    </Typography>
+                    <Typography color="text.primary" fontWeight={800} sx={{ mt: 0.5 }} variant="h4">
+                      {item.value}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      alignItems: "center",
+                      backgroundColor: item.tint,
+                      borderRadius: 3,
+                      color: item.color,
+                      display: "flex",
+                      height: 44,
+                      justifyContent: "center",
+                      width: 44,
+                    }}
+                  >
+                    <item.icon />
+                  </Box>
+                </Box>
+                <Typography color="text.secondary" sx={{ mt: 1.5 }} variant="caption">
+                  {item.helper}
                 </Typography>
-                <Typography color="text.primary" fontWeight={700} variant="h4">
-                  {item.value}
-                </Typography>
+                <Box
+                  sx={{
+                    backgroundColor: item.color,
+                    bottom: 0,
+                    height: 3,
+                    left: 0,
+                    position: "absolute",
+                    right: 0,
+                  }}
+                />
               </Paper>
             ))}
-          </Stack>
+          </Box>
 
           <Box
             sx={{
@@ -173,8 +258,9 @@ export default function App() {
               elevation={0}
               sx={{
                 border: 1,
-                borderColor: "divider",
-                p: 2,
+                borderColor: "rgba(148, 163, 184, 0.24)",
+                boxShadow: "0 12px 32px rgba(15, 23, 42, 0.05)",
+                p: 2.5,
                 position: { md: "sticky" },
                 top: { md: 24 },
               }}

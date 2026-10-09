@@ -32,7 +32,15 @@ export default function WorkflowMenu({ issues, selectedPhase, onSelectPhase }) {
             key={phaseId}
             onClick={() => onSelectPhase(phaseId)}
             selected={selectedPhase === phaseId}
-            sx={{ borderRadius: 2, mb: 0.5 }}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              "&.Mui-selected": {
+                backgroundColor: "rgba(79, 70, 229, 0.11)",
+                color: "primary.dark",
+              },
+              "&.Mui-selected:hover": { backgroundColor: "rgba(79, 70, 229, 0.16)" },
+            }}
           >
             <ListItemText primary={phaseId === "all" ? "All issues" : statusLabels[phaseId]} />
             <Typography color="text.secondary" variant="body2">

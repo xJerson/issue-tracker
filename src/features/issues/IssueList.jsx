@@ -49,10 +49,24 @@ export default function IssueList({ issues, onSelectIssue }) {
       <Stack component="ul" spacing={2} sx={{ listStyle: "none", m: 0, p: 0 }}>
         {visibleIssues.map((issue) => (
           // A stable key lets React track each item in the list.
-          <Card component="li" key={issue.id} variant="outlined">
+          <Card
+            component="li"
+            key={issue.id}
+            sx={{
+              borderColor: "rgba(148, 163, 184, 0.24)",
+              boxShadow: "0 4px 14px rgba(15, 23, 42, 0.035)",
+              transition: "border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease",
+              "&:hover": {
+                borderColor: "primary.main",
+                boxShadow: "0 14px 30px rgba(79, 70, 229, 0.12)",
+                transform: "translateY(-2px)",
+              },
+            }}
+            variant="outlined"
+          >
             {/* A card is a real control, so keyboard users can open ticket detail too. */}
             <CardActionArea onClick={() => onSelectIssue(issue.id)}>
-              <CardContent>
+              <CardContent sx={{ p: { xs: 2, sm: 2.5 }, "&:last-child": { pb: { xs: 2, sm: 2.5 } } }}>
               {/* A grid reserves the same column for every assignee chip. */}
               <Box
                 sx={{
