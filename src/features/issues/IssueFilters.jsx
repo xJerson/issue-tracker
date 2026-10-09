@@ -76,6 +76,18 @@ export default function IssueFilters({ assignees, filters, onChange, onClear }) 
           <MenuItem value="blocked">Blocked</MenuItem>
           <MenuItem value="unblocked">Unblocked</MenuItem>
         </TextField>
+        <TextField
+          label="Sort by"
+          name="sort"
+          onChange={onChange}
+          select
+          sx={{ minWidth: { xs: "100%", sm: 160 } }}
+          value={filters.sort}
+        >
+          <MenuItem value="newest">Newest reported</MenuItem>
+          <MenuItem value="oldest">Oldest reported</MenuItem>
+          <MenuItem value="priority">Highest priority</MenuItem>
+        </TextField>
         <Button
           color="inherit"
           onClick={onClear}

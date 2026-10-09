@@ -13,6 +13,7 @@ import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import CreateIssueDialog from "./features/issues/CreateIssueDialog";
+import DashboardMetrics from "./features/issues/DashboardMetrics";
 import IssueDetailDrawer from "./features/issues/IssueDetailDrawer";
 import IssueFilters from "./features/issues/IssueFilters";
 import IssueList from "./features/issues/IssueList";
@@ -26,6 +27,7 @@ const initialFilters = {
   blocked: "all",
   priority: "all",
   query: "",
+  sort: "newest",
 };
 
 const currentOperator = "Jerson";
@@ -67,6 +69,16 @@ export default function App() {
       (filters.blocked === "unblocked" && !issue.isBlocked);
 
     return matchesPhase && matchesQuery && matchesPriority && matchesAssignee && matchesBlocked;
+  }).sort((firstIssue, secondIssue) => {
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+    if (filters.sort === "priority") {
+      return priorityOrder[firstIssue.priority] - priorityOrder[secondIssue.priority];
+    }
+
+    return filters.sort === "oldest"
+      ? firstIssue.reportedAt.localeCompare(secondIssue.reportedAt)
+      : secondIssue.reportedAt.localeCompare(firstIssue.reportedAt);
   });
 
   // Derive dropdown options from the actual people assigned to tickets.
@@ -383,6 +395,8 @@ export default function App() {
               </Paper>
             ))}
           </Box>
+
+          <DashboardMetrics issues={issues} />
 
           <Box
             sx={{
