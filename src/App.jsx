@@ -7,19 +7,15 @@ import FiberNewRoundedIcon from "@mui/icons-material/FiberNewRounded";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { Link as RouterLink, Navigate, Route, Routes } from "react-router-dom";
 import CreateIssueDialog from "./features/issues/CreateIssueDialog";
-import DashboardMetrics from "./features/issues/DashboardMetrics";
 import IssueDetailDrawer from "./features/issues/IssueDetailDrawer";
-import IssueFilters from "./features/issues/IssueFilters";
-import IssueList from "./features/issues/IssueList";
+import DashboardOverview from "./features/dashboard/DashboardOverview";
+import TicketQueue from "./features/issues/TicketQueue";
 import useIssues from "./features/issues/useIssues";
 import { getNextStatus, statusLabels } from "./features/issues/workflow";
-import WorkflowMenu from "./features/issues/WorkflowMenu";
 
 // Keep a single resettable shape for every filter used by the ticket queue.
 const initialFilters = {
@@ -300,6 +296,12 @@ export default function App() {
             Issue Tracker
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
+          <Button component={RouterLink} to="/" color="inherit">
+            Overview
+          </Button>
+          <Button component={RouterLink} to="/tickets" color="inherit" sx={{ mr: 1 }}>
+            Tickets
+          </Button>
           <Button
             onClick={() => setIsCreateDialogOpen(true)}
             startIcon={<AddRoundedIcon />}
@@ -310,145 +312,26 @@ export default function App() {
         </Toolbar>
       </AppBar>
 
-      {/* A full-width container prevents the operational panel from feeling compressed. */}
-      <Container
-        disableGutters
-        maxWidth={false}
-        sx={{ px: { xs: 2, sm: 3, md: 5, lg: 8 }, py: { xs: 4, md: 6 } }}
-      >
-        <Stack spacing={4}>
-          <Box>
-            <Typography color="primary" fontWeight={700} variant="overline">
-              Product workspace
-            </Typography>
-            <Typography component="h1" sx={{ mt: 1 }} variant="h3">
-              Keep product issues visible and actionable.
-            </Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>
-              {today}
-            </Typography>
-            <Typography color="text.secondary" sx={{ mt: 2 }}>
-              Review the current work, identify blockers, and keep the team aligned.
-            </Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }} variant="body2">
-              Changes are saved automatically in this browser.
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              gap: 2,
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" },
-            }}
-          >
-            {issueSummary.map((item) => (
-              // Each item supplies its own color and icon, keeping the indicator reusable.
-              <Paper
-                elevation={0}
-                key={item.label}
-                sx={{
-                  border: 1,
-                  borderColor: "rgba(148, 163, 184, 0.24)",
-                  overflow: "hidden",
-                  p: 2.5,
-                  position: "relative",
-                }}
-              >
-                <Box sx={{ alignItems: "start", display: "flex", justifyContent: "space-between" }}>
-                  <Box>
-                    <Typography color="text.secondary" fontWeight={600} variant="body2">
-                      {item.label}
-                    </Typography>
-                    <Typography color="text.primary" fontWeight={800} sx={{ mt: 0.5 }} variant="h4">
-                      {item.value}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      alignItems: "center",
-                      backgroundColor: item.tint,
-                      borderRadius: 3,
-                      color: item.color,
-                      display: "flex",
-                      height: 44,
-                      justifyContent: "center",
-                      width: 44,
-                    }}
-                  >
-                    <item.icon />
-                  </Box>
-                </Box>
-                <Typography color="text.secondary" sx={{ mt: 1.5 }} variant="caption">
-                  {item.helper}
-                </Typography>
-                <Box
-                  sx={{
-                    backgroundColor: item.color,
-                    bottom: 0,
-                    height: 3,
-                    left: 0,
-                    position: "absolute",
-                    right: 0,
-                  }}
-                />
-              </Paper>
-            ))}
-          </Box>
-
-          <DashboardMetrics issues={issues} />
-
-          <Box
-            sx={{
-              alignItems: "start",
-              display: "grid",
-              gap: 3,
-              gridTemplateColumns: { xs: "1fr", md: "260px minmax(0, 1fr)" },
-            }}
-          >
-            <Paper
-              component="aside"
-              elevation={0}
-              sx={{
-                border: 1,
-                borderColor: "rgba(148, 163, 184, 0.24)",
-                boxShadow: "0 12px 32px rgba(15, 23, 42, 0.05)",
-                p: 2.5,
-                position: { md: "sticky" },
-                top: { md: 24 },
-              }}
-            >
-              <WorkflowMenu
-                issues={issues}
-                onSelectPhase={setSelectedPhase}
-                selectedPhase={selectedPhase}
-              />
-            </Paper>
-            <Box>
-              <Typography component="h2" fontWeight={700} variant="h5">
-                Ticket queue
-              </Typography>
-              <Typography color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
-                Work through the selected phase of the incident lifecycle.
-              </Typography>
-              <IssueFilters
-                assignees={assignees}
-                filters={filters}
-                onChange={updateFilters}
-                onClear={() => setFilters(initialFilters)}
-              />
-              <Box sx={{ mt: 2 }}>
-                {/* The key resets pagination when an operator changes filters or phases. */}
-                <IssueList
-                  issues={visibleIssues}
-                  key={`${selectedPhase}-${JSON.stringify(filters)}`}
-                  onSelectIssue={setSelectedIssueId}
-                />
-              </Box>
-            </Box>
-          </Box>
-        </Stack>
-      </Container>
+      <Routes>
+        <Route element={<DashboardOverview issueSummary={issueSummary} issues={issues} today={today} />} path="/" />
+        <Route
+          element={
+            <TicketQueue
+              assignees={assignees}
+              filters={filters}
+              issues={issues}
+              onClearFilters={() => setFilters(initialFilters)}
+              onFilterChange={updateFilters}
+              onSelectIssue={setSelectedIssueId}
+              onSelectPhase={setSelectedPhase}
+              selectedPhase={selectedPhase}
+              visibleIssues={visibleIssues}
+            />
+          }
+          path="/tickets"
+        />
+        <Route element={<Navigate replace to="/" />} path="*" />
+      </Routes>
       <IssueDetailDrawer
         onCloseIssue={closeIssue}
         onCompleteQa={completeQa}
