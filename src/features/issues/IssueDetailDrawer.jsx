@@ -14,6 +14,12 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import {
+  getCatalogLabel,
+  issueCategories,
+  issueTypes,
+  severityLevels,
+} from "./data/issueCatalog";
 import { teamMembers } from "./data/teamMembers";
 import { getNextStatus, statusLabels } from "./workflow";
 
@@ -49,6 +55,9 @@ export default function IssueDetailDrawer({ issue, onAdvance, onClose, onUpdate 
             <Stack direction="row" flexWrap="wrap" gap={1}>
               <Chip label={statusLabels[issue.status]} color="primary" />
               <Chip label={`${issue.priority} priority`} variant="outlined" />
+              <Chip label={getCatalogLabel(issueTypes, issue.type)} variant="outlined" />
+              <Chip label={getCatalogLabel(issueCategories, issue.category)} variant="outlined" />
+              <Chip label={getCatalogLabel(severityLevels, issue.severity)} variant="outlined" />
             </Stack>
 
             <Divider />
@@ -58,6 +67,42 @@ export default function IssueDetailDrawer({ issue, onAdvance, onClose, onUpdate 
                 Triage controls
               </Typography>
               <Stack spacing={2} sx={{ mt: 1.5 }}>
+                <TextField
+                  label="Type"
+                  onChange={(event) => onUpdate(issue.id, { type: event.target.value })}
+                  select
+                  value={issue.type}
+                >
+                  {issueTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Category"
+                  onChange={(event) => onUpdate(issue.id, { category: event.target.value })}
+                  select
+                  value={issue.category}
+                >
+                  {issueCategories.map((category) => (
+                    <MenuItem key={category.value} value={category.value}>
+                      {category.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Severity"
+                  onChange={(event) => onUpdate(issue.id, { severity: event.target.value })}
+                  select
+                  value={issue.severity}
+                >
+                  {severityLevels.map((severity) => (
+                    <MenuItem key={severity.value} value={severity.value}>
+                      {severity.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <TextField
                   label="Assignee"
                   onChange={(event) => onUpdate(issue.id, { assignee: event.target.value })}
