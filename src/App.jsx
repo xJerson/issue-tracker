@@ -14,10 +14,19 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import CreateIssueDialog from "./features/issues/CreateIssueDialog";
 import IssueDetailDrawer from "./features/issues/IssueDetailDrawer";
+import IssueFilters from "./features/issues/IssueFilters";
 import IssueList from "./features/issues/IssueList";
 import useIssues from "./features/issues/useIssues";
 import { getNextStatus } from "./features/issues/workflow";
 import WorkflowMenu from "./features/issues/WorkflowMenu";
+
+// Keep a single resettable shape for every filter used by the ticket queue.
+const initialFilters = {
+  assignee: "all",
+  blocked: "all",
+  priority: "all",
+  query: "",
+};
 
 // App composes the first Issue Tracker screen from feature-level components.
 export default function App() {
@@ -31,12 +40,26 @@ export default function App() {
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   // This state controls whether the report-issue dialog is visible.
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  // Filter state is shared by the filter controls and the visible ticket queue.
+  const [filters, setFilters] = useState(initialFilters);
 
-  // Filter tickets from the selected operational phase.
-  const visibleIssues =
-    selectedPhase === "all"
-      ? issues
-      : issues.filter((issue) => issue.status === selectedPhase);
+  // Apply every active filter in one predicate so filters can work together.
+  const visibleIssues = issues.filter((issue) => {
+    const searchableText = `${issue.id} ${issue.title} ${issue.description ?? ""}`.toLowerCase();
+    const matchesPhase = selectedPhase === "all" || issue.status === selectedPhase;
+    const matchesQuery = searchableText.includes(filters.query.trim().toLowerCase());
+    const matchesPriority = filters.priority === "all" || issue.priority === filters.priority;
+    const matchesAssignee = filters.assignee === "all" || issue.assignee === filters.assignee;
+    const matchesBlocked =
+      filters.blocked === "all" ||
+      (filters.blocked === "blocked" && issue.isBlocked) ||
+      (filters.blocked === "unblocked" && !issue.isBlocked);
+
+    return matchesPhase && matchesQuery && matchesPriority && matchesAssignee && matchesBlocked;
+  });
+
+  // Derive dropdown options from the actual people assigned to tickets.
+  const assignees = [...new Set(issues.map((issue) => issue.assignee))].sort();
 
   const selectedIssue = issues.find((issue) => issue.id === selectedIssueId) ?? null;
 
@@ -76,6 +99,13 @@ export default function App() {
     // Show the reported queue so the operator sees the newly created ticket.
     setSelectedPhase("reported");
     setIsCreateDialogOpen(false);
+  }
+
+  function updateFilters(event) {
+    setFilters((currentFilters) => ({
+      ...currentFilters,
+      [event.target.name]: event.target.value,
+    }));
   }
 
   // Derive summary values from the source data instead of duplicating state.
@@ -278,12 +308,20 @@ export default function App() {
               <Typography color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
                 Work through the selected phase of the incident lifecycle.
               </Typography>
-              {/* The key resets pagination when an operator switches workflow phases. */}
-              <IssueList
-                issues={visibleIssues}
-                key={selectedPhase}
-                onSelectIssue={setSelectedIssueId}
+              <IssueFilters
+                assignees={assignees}
+                filters={filters}
+                onChange={updateFilters}
+                onClear={() => setFilters(initialFilters)}
               />
+              <Box sx={{ mt: 2 }}>
+                {/* The key resets pagination when an operator changes filters or phases. */}
+                <IssueList
+                  issues={visibleIssues}
+                  key={`${selectedPhase}-${JSON.stringify(filters)}`}
+                  onSelectIssue={setSelectedIssueId}
+                />
+              </Box>
             </Box>
           </Box>
         </Stack>
