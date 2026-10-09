@@ -94,6 +94,7 @@ export default function App() {
             ...(issue.activity ?? []),
             createActivity(`Moved the ticket from ${statusLabels[issue.status]} to ${statusLabels[nextStatus]}.`),
           ],
+          qaStatus: nextStatus === "qa-validation" ? "pending" : issue.qaStatus,
           status: nextStatus,
         };
       }),
@@ -115,6 +116,68 @@ export default function App() {
           ? {
               ...issue,
               activity: [...(issue.activity ?? []), createActivity(`Commented: ${comment}`)],
+            }
+          : issue,
+      ),
+    );
+  }
+
+  function completeQa(issueId, result, notes) {
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) => {
+        if (issue.id !== issueId || issue.status !== "qa-validation") {
+          return issue;
+        }
+
+        const nextStatus = result === "passed" ? "ready-to-release" : "in-progress";
+        const resultLabel = result === "passed" ? "passed" : "failed";
+
+        return {
+          ...issue,
+          activity: [
+            ...(issue.activity ?? []),
+            createActivity(`QA ${resultLabel}: ${notes}`),
+            createActivity(`Moved the ticket from QA validation to ${statusLabels[nextStatus]}.`),
+          ],
+          qaNotes: notes,
+          qaStatus: result,
+          status: nextStatus,
+        };
+      }),
+    );
+  }
+
+  function closeIssue(issueId, resolutionSummary) {
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) =>
+        issue.id === issueId && issue.status === "released"
+          ? {
+              ...issue,
+              activity: [
+                ...(issue.activity ?? []),
+                createActivity(`Closed the ticket. Resolution: ${resolutionSummary}`),
+              ],
+              closedAt: new Date().toISOString(),
+              resolutionSummary,
+              status: "closed",
+            }
+          : issue,
+      ),
+    );
+  }
+
+  function reopenIssue(issueId, reason) {
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) =>
+        issue.id === issueId && issue.status === "closed"
+          ? {
+              ...issue,
+              activity: [
+                ...(issue.activity ?? []),
+                createActivity(`Reopened the ticket for triage. Reason: ${reason}`),
+              ],
+              closedAt: null,
+              status: "triaged",
             }
           : issue,
       ),
@@ -373,10 +436,13 @@ export default function App() {
         </Stack>
       </Container>
       <IssueDetailDrawer
+        onCloseIssue={closeIssue}
+        onCompleteQa={completeQa}
         issue={selectedIssue}
         onAdvance={advanceIssue}
         onAddComment={addComment}
         onClose={() => setSelectedIssueId(null)}
+        onReopenIssue={reopenIssue}
         onUpdate={updateIssue}
       />
       <CreateIssueDialog

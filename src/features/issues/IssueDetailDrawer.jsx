@@ -1,3 +1,4 @@
+import { useState } from "react";
 import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
@@ -25,8 +26,24 @@ import TicketActivity from "./TicketActivity";
 import { getNextStatus, statusLabels } from "./workflow";
 
 // The drawer focuses one ticket so operators can make a deliberate workflow decision.
-export default function IssueDetailDrawer({ issue, onAddComment, onAdvance, onClose, onUpdate }) {
+export default function IssueDetailDrawer({
+  issue,
+  onAddComment,
+  onAdvance,
+  onClose,
+  onCloseIssue,
+  onCompleteQa,
+  onReopenIssue,
+  onUpdate,
+}) {
   const nextStatus = issue ? getNextStatus(issue.status) : null;
+  // Keep each unfinished action form scoped to its ticket while the drawer remains open.
+  const [qaNotesByIssue, setQaNotesByIssue] = useState({});
+  const [reopenReasonsByIssue, setReopenReasonsByIssue] = useState({});
+  const [resolutionSummariesByIssue, setResolutionSummariesByIssue] = useState({});
+  const qaNotes = issue ? qaNotesByIssue[issue.id] ?? "" : "";
+  const reopenReason = issue ? reopenReasonsByIssue[issue.id] ?? "" : "";
+  const resolutionSummary = issue ? resolutionSummariesByIssue[issue.id] ?? "" : "";
 
   return (
     <Drawer anchor="right" onClose={onClose} open={Boolean(issue)}>
@@ -201,7 +218,118 @@ export default function IssueDetailDrawer({ issue, onAddComment, onAdvance, onCl
               </Box>
             </Box>
 
-            {nextStatus ? (
+            {issue.status === "qa-validation" && (
+              <Box>
+                <Typography fontWeight={700} variant="subtitle1">
+                  QA decision
+                </Typography>
+                <Typography color="text.secondary" sx={{ mt: 0.5 }} variant="body2">
+                  Record the validation result before the ticket can continue.
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="QA notes"
+                  multiline
+                  onChange={(event) =>
+                    setQaNotesByIssue((currentNotes) => ({ ...currentNotes, [issue.id]: event.target.value }))
+                  }
+                  placeholder="Describe what was tested and the result."
+                  required
+                  rows={3}
+                  sx={{ mt: 1.5 }}
+                  value={qaNotes}
+                />
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 1.5 }}>
+                  <Button
+                    color="error"
+                    disabled={issue.isBlocked || !qaNotes.trim()}
+                    onClick={() => onCompleteQa(issue.id, "failed", qaNotes.trim())}
+                    variant="outlined"
+                  >
+                    Return to development
+                  </Button>
+                  <Button
+                    disabled={issue.isBlocked || !qaNotes.trim()}
+                    onClick={() => onCompleteQa(issue.id, "passed", qaNotes.trim())}
+                    variant="contained"
+                  >
+                    Pass QA
+                  </Button>
+                </Stack>
+              </Box>
+            )}
+
+            {issue.status === "released" && (
+              <Box>
+                <Typography fontWeight={700} variant="subtitle1">
+                  Close ticket
+                </Typography>
+                <Typography color="text.secondary" sx={{ mt: 0.5 }} variant="body2">
+                  Confirm the released fix and leave a resolution summary.
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="Resolution summary"
+                  multiline
+                  onChange={(event) =>
+                    setResolutionSummariesByIssue((currentSummaries) => ({
+                      ...currentSummaries,
+                      [issue.id]: event.target.value,
+                    }))
+                  }
+                  placeholder="Explain how the incident was resolved."
+                  required
+                  rows={3}
+                  sx={{ mt: 1.5 }}
+                  value={resolutionSummary}
+                />
+                <Button
+                  disabled={issue.isBlocked || !resolutionSummary.trim()}
+                  onClick={() => onCloseIssue(issue.id, resolutionSummary.trim())}
+                  sx={{ mt: 1.5 }}
+                  variant="contained"
+                >
+                  Close ticket
+                </Button>
+              </Box>
+            )}
+
+            {issue.status === "closed" && (
+              <Box>
+                <Typography fontWeight={700} variant="subtitle1">
+                  Resolution
+                </Typography>
+                <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+                  {issue.resolutionSummary || "No resolution summary was recorded."}
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="Reason for reopening"
+                  multiline
+                  onChange={(event) =>
+                    setReopenReasonsByIssue((currentReasons) => ({
+                      ...currentReasons,
+                      [issue.id]: event.target.value,
+                    }))
+                  }
+                  placeholder="Explain why this ticket needs another review."
+                  required
+                  rows={3}
+                  sx={{ mt: 2 }}
+                  value={reopenReason}
+                />
+                <Button
+                  disabled={!reopenReason.trim()}
+                  onClick={() => onReopenIssue(issue.id, reopenReason.trim())}
+                  sx={{ mt: 1.5 }}
+                  variant="outlined"
+                >
+                  Reopen for triage
+                </Button>
+              </Box>
+            )}
+
+            {nextStatus && !["qa-validation", "released"].includes(issue.status) ? (
               <Button
                 disabled={issue.isBlocked}
                 endIcon={<ArrowForwardRoundedIcon />}
@@ -210,9 +338,9 @@ export default function IssueDetailDrawer({ issue, onAddComment, onAdvance, onCl
               >
                 Move to {statusLabels[nextStatus]}
               </Button>
-            ) : (
+            ) : !["qa-validation", "released", "closed"].includes(issue.status) ? (
               <Alert severity="success">This ticket has completed its lifecycle.</Alert>
-            )}
+            ) : null}
           </Stack>
         )}
       </Box>
